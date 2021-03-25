@@ -32,38 +32,75 @@ const unsigned char name[]={\
         0,      8,      (code)+3,   (pal)|OAM_FLIP_H, \
         128};
 
-DEF_METASPRITE_2x2(playerRStand, 0xd8, 0);
-DEF_METASPRITE_2x2(playerRRun1, 0xdc, 0);
-DEF_METASPRITE_2x2(playerRRun2, 0xe0, 0);
-DEF_METASPRITE_2x2(playerRRun3, 0xe4, 0);
-DEF_METASPRITE_2x2(playerRJump, 0xe8, 0);
-DEF_METASPRITE_2x2(playerRClimb, 0xec, 0);
-DEF_METASPRITE_2x2(playerRSad, 0xf0, 0);
+//Player 1
+DEF_METASPRITE_2x2(player1RStand, 0xd8, 0);
+DEF_METASPRITE_2x2(player1RRun1, 0xdc, 0);
+DEF_METASPRITE_2x2(player1RRun2, 0xe0, 0);
+DEF_METASPRITE_2x2(player1RRun3, 0xe4, 0);
+DEF_METASPRITE_2x2(player1RJump, 0xe8, 0);
+DEF_METASPRITE_2x2(player1RClimb, 0xec, 0);
+DEF_METASPRITE_2x2(player1RSad, 0xf0, 0);
 
-DEF_METASPRITE_2x2_FLIP(playerLStand, 0xd8, 0);
-DEF_METASPRITE_2x2_FLIP(playerLRun1, 0xdc, 0);
-DEF_METASPRITE_2x2_FLIP(playerLRun2, 0xe0, 0);
-DEF_METASPRITE_2x2_FLIP(playerLRun3, 0xe4, 0);
-DEF_METASPRITE_2x2_FLIP(playerLJump, 0xe8, 0);
-DEF_METASPRITE_2x2_FLIP(playerLClimb, 0xec, 0);
-DEF_METASPRITE_2x2_FLIP(playerLSad, 0xf0, 0);
+DEF_METASPRITE_2x2_FLIP(player1LStand, 0xd8, 0);
+DEF_METASPRITE_2x2_FLIP(player1LRun1, 0xdc, 0);
+DEF_METASPRITE_2x2_FLIP(player1LRun2, 0xe0, 0);
+DEF_METASPRITE_2x2_FLIP(player1LRun3, 0xe4, 0);
+DEF_METASPRITE_2x2_FLIP(player1LJump, 0xe8, 0);
+DEF_METASPRITE_2x2_FLIP(player1LClimb, 0xec, 0);
+DEF_METASPRITE_2x2_FLIP(player1LSad, 0xf0, 0);
 
-DEF_METASPRITE_2x2(personToSave, 0xba, 1);
+//Player 2
+DEF_METASPRITE_2x2(player2RStand, 0xd8, 2);
+DEF_METASPRITE_2x2(player2RRun1, 0xdc, 2);
+DEF_METASPRITE_2x2(player2RRun2, 0xe0, 2);
+DEF_METASPRITE_2x2(player2RRun3, 0xe4, 2);
+DEF_METASPRITE_2x2(player2RJump, 0xe8, 2);
+DEF_METASPRITE_2x2(player2RClimb, 0xec, 2);
+DEF_METASPRITE_2x2(player2RSad, 0xf0, 2);
 
-const unsigned char* const playerRunSeq[16] = {
-  playerLRun1, playerLRun2, playerLRun3, 
-  playerLRun1, playerLRun2, playerLRun3, 
-  playerLRun1, playerLRun2,
-  playerRRun1, playerRRun2, playerRRun3, 
-  playerRRun1, playerRRun2, playerRRun3, 
-  playerRRun1, playerRRun2,
+DEF_METASPRITE_2x2_FLIP(player2LStand, 0xd8, 2);
+DEF_METASPRITE_2x2_FLIP(player2LRun1, 0xdc, 2);
+DEF_METASPRITE_2x2_FLIP(player2LRun2, 0xe0, 2);
+DEF_METASPRITE_2x2_FLIP(player2LRun3, 0xe4, 2);
+DEF_METASPRITE_2x2_FLIP(player2LJump, 0xe8, 2);
+DEF_METASPRITE_2x2_FLIP(player2LClimb, 0xec, 2);
+DEF_METASPRITE_2x2_FLIP(player2LSad, 0xf0, 2);
+
+const unsigned char* const playerRunSeq[2][16] = 
+{
+  {
+    player1LRun1, player1LRun2, player1LRun3, 
+    player1LRun1, player1LRun2, player1LRun3, 
+    player1LRun1, player1LRun2,
+    player1RRun1, player1RRun2, player1RRun3, 
+    player1RRun1, player1RRun2, player1RRun3, 
+    player1RRun1, player1RRun2
+  },
+  {
+    player2LRun1, player2LRun2, player2LRun3, 
+    player2LRun1, player2LRun2, player2LRun3, 
+    player2LRun1, player2LRun2,
+    player2RRun1, player2RRun2, player2RRun3, 
+    player2RRun1, player2RRun2, player2RRun3, 
+    player2RRun1, player2RRun2
+  }
+};
+
+const unsigned char* const playerStandR[2] = 
+{
+  player1RStand, player2RStand
+};
+
+const unsigned char* const playerStandL[2] = 
+{
+  player1LStand, player2LStand
 };
 
 /*{pal:"nes",layout:"nes"}*/
 const char PALETTE[32] = { 
-  0x03,			// screen color
+  0x00,			// screen color
 
-  0x11,0x30,0x27,0x0,	// background palette 0
+  0x15,0x30,0x27,0x0,	// background palette 0
   0x1c,0x20,0x2c,0x0,	// background palette 1
   0x00,0x10,0x20,0x0,	// background palette 2
   0x06,0x16,0x26,0x0,	// background palette 3
@@ -95,6 +132,9 @@ sbyte actor_dx[NUM_ACTORS];
 sbyte actor_dy[NUM_ACTORS];
 // actors direction (0 = left, 1 = right)
 char actor_run_dir[NUM_ACTORS];
+
+byte actor_run_animation[NUM_ACTORS];
+byte actor_stand_sprite[NUM_ACTORS];
 
 void move_player()
 {
@@ -131,12 +171,17 @@ void main() {
   for (i=0; i<NUM_ACTORS; i++) {
     actor_x[i] = 240/2;
     if(i == 1)
+    {
       actor_y[i] = 200;
+    }
     else
+    {
       actor_y[i] = 14;
+    }
     actor_dx[i] = 0;
     actor_dy[i] = 0;
     actor_run_dir[i] = 0;
+    
   }
   // loop forever
   while (1) {
@@ -151,20 +196,20 @@ void main() {
       if (actor_dx[i] > 0)
       {
         runseq += 8;
-        oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRunSeq[runseq]);
+        oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRunSeq[i][runseq]);
       	actor_x[i] += actor_dx[i];
       }
       else if(actor_dx[i] < 0)
       {
-        oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRunSeq[runseq]);
+        oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRunSeq[i][runseq]);
       	actor_x[i] += actor_dx[i];
       }
       else
       {
         if(actor_run_dir[i] == 1)
-          oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRStand);
+          oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerStandR[i]);
         else
-          oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerLStand);
+          oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerStandL[i]);
       }
       
     }
