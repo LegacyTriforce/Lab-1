@@ -1,112 +1,177 @@
+//Tyler Swearingen's NES game
 
-/*
-A simple "hello world" example.
-Set the screen background color and palette colors.
-Then write a message to the nametable.
-Finally, turn on the PPU to display video.
-*/
+#include <stdlib.h>
+#include <string.h>
 
+// include NESLIB header
 #include "neslib.h"
-#include "vrambuf.h"
+
+// include CC65 NES Header (PPU)
+#include <nes.h>
 
 // link the pattern table into CHR ROM
 //#link "chr_generic.s"
-//#link "vrambuf.c"
 
-#define TILE 0xd8
-#define ATTR 0
-#define FLIP OAM_FLIP_H
+///// METASPRITES
 
-const unsigned char metaspriteR[]={
-        0,      0,      TILE+0,   ATTR,
-        0,      8,      TILE+1,   ATTR,
-        8,      0,      TILE+2,   ATTR,
-        8,      8,      TILE+3,   ATTR, 
+// define a 2x2 metasprite
+#define DEF_METASPRITE_2x2(name,code,pal)\
+const unsigned char name[]={\
+        0,      0,      (code)+0,   pal, \
+        0,      8,      (code)+1,   pal, \
+        8,      0,      (code)+2,   pal, \
+        8,      8,      (code)+3,   pal, \
         128};
 
-const unsigned char metaspriteL[]={
-        0,      0,      TILE+2,   FLIP, 
-        0,      8,      TILE+3,   FLIP, 
-        8,      0,      TILE+0,   FLIP, 
-        8,      8,      TILE+1,   FLIP, 
+// define a 2x2 metasprite, flipped horizontally
+#define DEF_METASPRITE_2x2_FLIP(name,code,pal)\
+const unsigned char name[]={\
+        8,      0,      (code)+0,   (pal)|OAM_FLIP_H, \
+        8,      8,      (code)+1,   (pal)|OAM_FLIP_H, \
+        0,      0,      (code)+2,   (pal)|OAM_FLIP_H, \
+        0,      8,      (code)+3,   (pal)|OAM_FLIP_H, \
         128};
 
-// main function, run after console reset
-void main(void) 
-{
-  unsigned char x = 0;
-  unsigned char is_right = 0;
-  
+DEF_METASPRITE_2x2(playerRStand, 0xd8, 0);
+DEF_METASPRITE_2x2(playerRRun1, 0xdc, 0);
+DEF_METASPRITE_2x2(playerRRun2, 0xe0, 0);
+DEF_METASPRITE_2x2(playerRRun3, 0xe4, 0);
+DEF_METASPRITE_2x2(playerRJump, 0xe8, 0);
+DEF_METASPRITE_2x2(playerRClimb, 0xec, 0);
+DEF_METASPRITE_2x2(playerRSad, 0xf0, 0);
+
+DEF_METASPRITE_2x2_FLIP(playerLStand, 0xd8, 0);
+DEF_METASPRITE_2x2_FLIP(playerLRun1, 0xdc, 0);
+DEF_METASPRITE_2x2_FLIP(playerLRun2, 0xe0, 0);
+DEF_METASPRITE_2x2_FLIP(playerLRun3, 0xe4, 0);
+DEF_METASPRITE_2x2_FLIP(playerLJump, 0xe8, 0);
+DEF_METASPRITE_2x2_FLIP(playerLClimb, 0xec, 0);
+DEF_METASPRITE_2x2_FLIP(playerLSad, 0xf0, 0);
+
+DEF_METASPRITE_2x2(personToSave, 0xba, 1);
+
+const unsigned char* const playerRunSeq[16] = {
+  playerLRun1, playerLRun2, playerLRun3, 
+  playerLRun1, playerLRun2, playerLRun3, 
+  playerLRun1, playerLRun2,
+  playerRRun1, playerRRun2, playerRRun3, 
+  playerRRun1, playerRRun2, playerRRun3, 
+  playerRRun1, playerRRun2,
+};
+
+/*{pal:"nes",layout:"nes"}*/
+const char PALETTE[32] = { 
+  0x03,			// screen color
+
+  0x11,0x30,0x27,0x0,	// background palette 0
+  0x1c,0x20,0x2c,0x0,	// background palette 1
+  0x00,0x10,0x20,0x0,	// background palette 2
+  0x06,0x16,0x26,0x0,	// background palette 3
+
+  0x16,0x35,0x24,0x0,	// sprite palette 0
+  0x00,0x37,0x25,0x0,	// sprite palette 1
+  0x0d,0x2d,0x3a,0x0,	// sprite palette 2
+  0x0d,0x27,0x2a	// sprite palette 3
+};
+
+// setup PPU and tables
+void setup_graphics() {
+  // clear sprites
+  oam_hide_rest(0);
   // set palette colors
-  pal_col(0,0x02);	// set screen to dark blue
-  pal_col(1,0x14);	// fuchsia
-  pal_col(2,0x20);	// grey
-  pal_col(3,0x30);	// white
-  
-  pal_col(17, 0x15);
-  pal_col(18, 0x28);
-  pal_col(19, 0x30);
-
-  // write text to name table
-  vram_adr(NTADR_A(2,2));		// set address
-  vram_write("This is", 7);	// write bytes to video RAM
-  vram_adr(NTADR_A(2,3));
-  vram_write("Tyler Swearingen's", 18);
-  vram_adr(NTADR_A(2,4));
-  vram_write("first NES 'Game'!", 17);
-  
-  vram_adr(NTADR_A(1, 22));
-  vram_fill(0x0e,30);
-  
-  vram_adr(NTADR_A(29, 20));
-  vram_put(0xc4);
-  vram_adr(NTADR_A(30, 20));
-  vram_put(0xc6);
-  vram_adr(NTADR_A(29, 21));
-  vram_put(0xc5);
-  vram_adr(NTADR_A(30, 21));
-  vram_put(0xc7);
-  
-  // enable PPU rendering (turn on screen)
+  pal_all(PALETTE);
+  // turn on PPU
   ppu_on_all();
-  vrambuf_clear();
-  set_vram_update(updbuf);
+}
 
-  // infinite loop
-  while (1) 
+// number of actors (4 h/w sprites each)
+#define NUM_ACTORS 2
+
+// actor x/y positions
+byte actor_x[NUM_ACTORS];
+byte actor_y[NUM_ACTORS];
+// actor x/y deltas per frame (signed)
+sbyte actor_dx[NUM_ACTORS];
+sbyte actor_dy[NUM_ACTORS];
+// actors direction (0 = left, 1 = right)
+char actor_run_dir[NUM_ACTORS];
+
+void move_player()
+{
+  char i;
+  byte pad;
+  for (i=0; i<2; i++) 
   {
-    char cur_oam = 0;
-    char door = 0;
-    
-    if(is_right == 0)
+    // poll controller i (0-1)
+    pad = pad_poll(i);
+    // move actor[i] left/right
+    if (pad&PAD_LEFT && actor_x[i]>6) 
     {
-      x += 1;
-      cur_oam = oam_meta_spr(x, 160, cur_oam, metaspriteR);
+      actor_dx[i]=-2;
+      actor_run_dir[i] = 0;
     }
+    else if (pad&PAD_RIGHT && actor_x[i]<234) 
+    {
+      actor_dx[i]=2;
+      actor_run_dir[i] = 1;
+    }
+    else 
+      actor_dx[i]=0;
+  }
+}
+  
+// main program
+void main() {
+  char oam_id;	// sprite ID	
+  char i;
+  
+  // setup graphics
+  setup_graphics();
+  // initialize actors with random values
+  for (i=0; i<NUM_ACTORS; i++) {
+    actor_x[i] = 240/2;
+    if(i == 1)
+      actor_y[i] = 200;
     else
-    {
-      x -= 1;
-      cur_oam = oam_meta_spr(x, 160, cur_oam, metaspriteL);
-    }
+      actor_y[i] = 14;
+    actor_dx[i] = 0;
+    actor_dy[i] = 0;
+    actor_run_dir[i] = 0;
+  }
+  // loop forever
+  while (1) {
+    // start with OAMid/sprite 0
+    oam_id = 0;
+    // set player 0/1 velocity based on controller
     
-    if(x == 236)
-    {
-      is_right = 1;
+    move_player();
+    // draw and move all actors
+    for (i=0; i<NUM_ACTORS; i++) {
+      byte runseq = actor_x[i] & 7;
+      if (actor_dx[i] > 0)
+      {
+        runseq += 8;
+        oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRunSeq[runseq]);
+      	actor_x[i] += actor_dx[i];
+      }
+      else if(actor_dx[i] < 0)
+      {
+        oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRunSeq[runseq]);
+      	actor_x[i] += actor_dx[i];
+      }
+      else
+      {
+        if(actor_run_dir[i] == 1)
+          oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerRStand);
+        else
+          oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, playerLStand);
+      }
+      
     }
-    else if(x == 8)
-    {
-      is_right = 0;
-    }
-    
-    if(x >= 228)
-    {
-      vrambuf_put(NTADR_A(2, 5), "On the door!", 12);
-    }
-    else
-    {
-      vrambuf_put(NTADR_A(2, 5), "           ", 12);
-    }
-    
-    vrambuf_flush();
+    // hide rest of sprites
+    // if we haven't wrapped oam_id around to 0
+    if (oam_id!=0) oam_hide_rest(oam_id);
+    // wait for next frame
+    ppu_wait_frame();
   }
 }
